@@ -411,6 +411,17 @@ class TransformerModel(nn.Module):
 
         return output, logits
 
+    def init_transformer(model, pretrained_path=None):
+        if pretrained_path is None:
+            for param in model.named_parameters():
+                if 'weight' in param[0] and 'layerNorm' not in param[0]:
+                    torch.nn.init.xavier_uniform_(param[1])
+            print("Initialization of weights completed")
+        else:
+            weight = torch.load(pretrained_path, map_location='cpu')
+            model.load_state_dict(weight)
+            print("Loading of pre-trained weight completed")
+
 
 if __name__ == '__main__':
     from i_abstract_structure.config.config import get_config_dict
