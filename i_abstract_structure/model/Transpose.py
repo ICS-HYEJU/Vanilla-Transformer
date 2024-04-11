@@ -434,7 +434,7 @@ if __name__ == '__main__':
                              num_head=cfg['dataset_info']['num_head'], inner_dim=cfg['dataset_info']['inner_dim'])
 
     bible_object = bible(cfg=cfg, seq_len=cfg['dataset_info']['seq_len'])
-    bible_dataloader = torch.utils.data.DataLoader(bible_object, batch_size=cfg['dataset_info']['batch_size'], drop_last=True)
+    bible_dataloader = torch.utils.data.DataLoader(bible_object, batch_size=cfg['dataset_info']['batch_size'])
 
     for idx, data in enumerate(bible_dataloader):
         src = data[0]
