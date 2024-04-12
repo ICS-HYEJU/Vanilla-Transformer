@@ -4,20 +4,17 @@ import torch
 import time
 import os
 import numpy as np
-
 #
 FP16 = False
 from torch.cuda import amp
 #
 from i_abstract_structure.dataset import train_dataloader, val_dataloader
-
-
 #
 
 class Trainer():
     def __init__(self, cfg, device=torch.device('cpu')):
-        self.cfg = cfg
-        self.device = device
+        self.cfg=cfg
+        self.device=device
 
         # ===== Save Path =====
         self.save_path = self.make_save_path()
@@ -26,7 +23,7 @@ class Trainer():
         # self.tblogger = SummaryWriter(self.save_path)
 
         # ===== DataLoader =====
-        self.train_loader, self.val_loader = self.get_dataloader()
+        self.train_loader= self.get_dataloader()
 
         # ===== Model =====
         self.model = self.build_model()
@@ -44,8 +41,8 @@ class Trainer():
         self.max_epoch = self.cfg['solver']['max_epoch']
         self.max_stepnum = len(self.train_loader)
 
-    def calc_loss(self, logits: torch.tensor, targets: torch.tensor):
-        logits = logits.view(-1, self.cfg['dataset_info']['vocab_size'])
+    def calc_loss(self, logits:torch.tensor, targets:torch.tensor):
+        logits = logits.view(-1,self.cfg['dataset_info']['vocab_size'])
         targets = targets.view(-1)
         return self.criterion(logits, targets)
 
@@ -73,8 +70,7 @@ class Trainer():
 
     def get_dataloader(self):
         train_loader = train_dataloader(self.cfg, mode='train')
-        val_loader = val_dataloader(self.cfg, mode='val')
-        return train_loader, val_loader
+        return train_loader
 
     def make_save_path(self):
         save_path = os.path.join(self.cfg['path']['save_base_path'],
@@ -99,7 +95,7 @@ class Trainer():
         # Set Trian Mode
         self.model.train()
 
-        if (FP16):
+        if(FP16):
             scaler = amp.GradScaler()
 
         dataset_size = 0
@@ -107,7 +103,7 @@ class Trainer():
         running_accuracy = 0
         accuracy = 0
 
-        bar = tqdm(enumerate(self.train_loader), total=len(self.train_loader))
+        bar = tqdm(enumerate(self.train_loader), total = len(self.train_loader))
 
         for step, data in bar:
             src = data[0].to(self.device)
@@ -116,7 +112,7 @@ class Trainer():
 
             batch_size = src.shape[0]
 
-            if (FP16):
+            if(FP16):
                 with amp.autocast(enabled=True):
                     output, logits = self.model(enc_src=src, dec_src=trg_input)
                     loss = self.calc_loss(logits, trg_output)
@@ -150,9 +146,7 @@ class Trainer():
             # loss.item() is transformation loss to Python Float
             # loss.item() is loss of batch data. So, To calculate sum of loss, * (batch_size)
             running_loss += loss.item() * batch_size
-            running_accuracy = np.mean(
-                output.view(-1).detach().cpu().numpy() == trg_output.view(-1).detach().cpu().numpy
-            )
+            running_accuracy = np.mean(output.view(-1).detach().cpu().numpy() == trg_output.view(-1).detach().cpu().numpy())
 
             accuracy += running_accuracy
 
@@ -161,10 +155,10 @@ class Trainer():
 
             bar.set_postfix(
                 Epoch=epoch, Train_loss=epoch_loss, LR=self.optimizer.param_groups[0]["lr"],
-                accuracy=accuracy / float(step + 1)
+                accuracy=accuracy / float(step+1)
             )
 
-            # break
+            #break
 
         accuracy /= len(self.train_loader)
 
