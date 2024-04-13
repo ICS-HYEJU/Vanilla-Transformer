@@ -187,5 +187,3 @@ if __name__ == '__main__':
     trainer = Trainer(cfg)
     # Start train
     trainer.start_train()
-    # Start validation
-    trainer.start_valid()
