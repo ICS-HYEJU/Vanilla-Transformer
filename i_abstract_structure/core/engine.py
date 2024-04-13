@@ -8,7 +8,7 @@ import numpy as np
 FP16 = False
 from torch.cuda import amp
 #
-from i_abstract_structure.dataset import train_dataloader, val_dataloader
+from i_abstract_structure.dataset import train_dataloader
 #
 
 class Trainer():
@@ -84,7 +84,16 @@ class Trainer():
             start_time = time.time()
             for epoch in range(self.max_epoch):
                 self.train_one_epoch(epoch)
+                #
+                if epoch % 1 == 0:
+                    torch.save({'model': self.model.state_dict()},
+                               os.path.join(self.save_path, f'weight_{epoch}.pth'))
+                    torch.save({'model': self.model.state_dict()},
+                               os.path.join(self.save_path, f'last_weight.pth'))
+
+
             print(f'\nTraining completed in {(time.time() - start_time) / 3600:.3f} hours.')
+
 
             self.scheduler.step()
         except Exception as _:
@@ -178,3 +187,5 @@ if __name__ == '__main__':
     trainer = Trainer(cfg)
     # Start train
     trainer.start_train()
+    # Start validation
+    trainer.start_valid()
