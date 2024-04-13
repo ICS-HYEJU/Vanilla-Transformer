@@ -49,6 +49,9 @@ def get_config_dict():
         eta_min = 1e-5,
 
     )
+    weight_info = dict(
+        name = 'last_weight.pth',
+    )
 
     # Merge all information into a dictionary variable
     config = dict(
@@ -58,6 +61,7 @@ def get_config_dict():
         model = model,
         solver = solver,
         scheduler= scheduler,
+        weight_info = weight_info
     )
 
     return config
